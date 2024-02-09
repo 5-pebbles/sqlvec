@@ -9,7 +9,7 @@ use rusqlite::{
 
 /// A generic container for vectors whose contents implement ToString & FromStr.
 ///
-/// `SqlVec` implements ToSql & FromSql storing values as `\u{F1}` separated text, allowing for SQL operations.
+/// `SqlVec` implements ToSql & FromSql storing values as `\u{F1}` delimited text, allowing for SQL operations.
 /// 
 /// # Example
 /// ```

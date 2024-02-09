@@ -7,7 +7,7 @@ use rusqlite::{
     types::{FromSql, FromSqlResult, ToSql, ToSqlOutput, Value, ValueRef},
 };
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
 pub struct SqlVec<T: ToString + FromStr>(Vec<T>);
 
 impl<T: ToString + FromStr> SqlVec<T> {

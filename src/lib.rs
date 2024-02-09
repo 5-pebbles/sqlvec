@@ -15,6 +15,10 @@ impl<T: ToString + FromStr> SqlVec<T> {
         let items: Vec<T> = items.into_iter().collect();
         Self(items)
     }
+
+    pub fn into_inner(self) -> Vec<T> {
+        self.0
+    }
 }
 
 impl<T: ToString + FromStr> ToString for SqlVec<T> {

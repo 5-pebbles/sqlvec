@@ -7,15 +7,73 @@ use rusqlite::{
     types::{FromSql, FromSqlResult, ToSql, ToSqlOutput, Value, ValueRef},
 };
 
+/// A generic container for vectors whose contents implement ToString & FromStr.
+///
+/// `SqlVec` implements ToSql & FromSql storing values as `\u{F1}` separated text, allowing for SQL operations.
+/// 
+/// # Example
+/// ```
+///  use sqlvec::SqlVec;
+///  use rusqlite::{Error, Connection, params};
+///
+///  let conn = Connection::open_in_memory().unwrap();
+///
+///  // Create a table with a column that uses our custom type.
+///  conn.execute(
+///      "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, data TEXT);",
+///      [],
+///  ).unwrap();
+///
+///  // Insert a SqlVec into the table.
+///  let values = SqlVec::new(vec!["one".to_string(), "two".to_string()]);
+///  conn.execute(
+///      "INSERT INTO test (data) VALUES (?1)",
+///      params![values],
+///  ).unwrap();
+///
+///  // Retrieve the SqlVec from the table.
+///  let mut stmt = conn.prepare("SELECT data FROM test WHERE id = ?1").unwrap();
+///  let mut rows = stmt.query(params![1]).unwrap();
+///  let row = rows.next().unwrap().unwrap();
+///  let db_values: SqlVec<String> = row.get(0).unwrap();
+///
+///  // Assert that the retrieved SqlVec matches the original.
+///  assert_eq!(values, db_values);
+/// ```
 #[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
 pub struct SqlVec<T: ToString + FromStr>(Vec<T>);
 
 impl<T: ToString + FromStr> SqlVec<T> {
+    /// Creates a new `SqlVec` from an iterable collection of items.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use sqlvec::SqlVec;
+    ///
+    /// let vec = SqlVec::new([1, 2, 3]);
+    ///
+    /// ```
     pub fn new<I: IntoIterator<Item = T>>(items: I) -> Self {
         let items: Vec<T> = items.into_iter().collect();
         Self(items)
     }
 
+    /// Consumes the `SqlVec`, returning its internal vector.
+    ///
+    /// This method allows you to take ownership of the underlying vector contained within the `SqlVec`. After calling `into_inner`, the `SqlVec` cannot be used anymore unless recreated.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sqlvec::SqlVec; 
+    /// 
+    /// let sql_vec = SqlVec::new(vec![1, 2]); 
+    /// let vec = sql_vec.into_inner(); 
+    /// 
+    /// assert_eq!(vec, vec![1, 2]); 
+    ///
+    /// ```
     pub fn into_inner(self) -> Vec<T> {
         self.0
     }

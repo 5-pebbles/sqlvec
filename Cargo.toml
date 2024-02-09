@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 rusqlite = "0.30.0"
-rusqlite-from-row = "0.2.2"
 serde = { version = "1.0.196", features = ["derive"] }

@@ -1,4 +1,4 @@
-use std::{str::FromStr, string::ToString};
+use std::{str::FromStr, string::ToString, iter::FromIterator};
 
 use serde::{Deserialize, Serialize};
 
@@ -78,6 +78,13 @@ impl<T: ToString + FromStr> SqlVec<T> {
         self.0
     }
 }
+
+impl<T: ToString + FromStr> FromIterator<T> for SqlVec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        SqlVec(iter.into_iter().collect())
+    }
+}
+
 
 impl<T: ToString + FromStr> ToString for SqlVec<T> {
     fn to_string(&self) -> String {

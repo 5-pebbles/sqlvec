@@ -77,6 +77,24 @@ impl<T: ToString + FromStr> SqlVec<T> {
     pub fn into_inner(self) -> Vec<T> {
         self.0
     }
+
+    /// Returns a borrowed reference to the internal vector.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use sqlvec::SqlVec; 
+    /// 
+    /// let sql_vec = SqlVec::new(vec![1, 2]); 
+    /// let vec_ref = sql_vec.inner(); 
+    ///
+    ///
+    /// assert_eq!(vec_ref, &vec![1, 2]);
+    ///
+    /// ```
+    pub fn inner(&self) -> &Vec<T> {
+        &self.0
+    }
 }
 
 impl<T: ToString + FromStr> FromIterator<T> for SqlVec<T> {
@@ -84,7 +102,6 @@ impl<T: ToString + FromStr> FromIterator<T> for SqlVec<T> {
         SqlVec(iter.into_iter().collect())
     }
 }
-
 
 impl<T: ToString + FromStr> ToString for SqlVec<T> {
     fn to_string(&self) -> String {

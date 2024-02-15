@@ -65,7 +65,7 @@ impl<T: ToString + FromStr> SqlVec<T> {
     ///
     /// This method allows you to take ownership of the underlying vector contained within the `SqlVec`. After calling `into_inner`, the `SqlVec` cannot be used anymore unless recreated.
     ///
-    /// # Examples
+    /// # Example
     ///
     /// ```
     /// use sqlvec::SqlVec; 

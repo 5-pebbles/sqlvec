@@ -2,12 +2,15 @@
 
 A generic container for vectors allowing for rusqlite operations.
 
+The vector must contain elements that implement `ToString` & `FromStr`.
+
 `SqlVec` implements `ToSql` & `FromSql` storing values as `\u{F1}` delimited text.
 
+> If the sqlite conversion is to be bidirectional then the `ToString` & `FromStr` must also be bidirectional.
 
 ```toml
 [dependencies]
-sqlvec = "0.0.1"
+sqlvec = { version = "0.0.1", features = ["serde"] }
 ```
 
 ## Usage

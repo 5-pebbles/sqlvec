@@ -1,5 +1,6 @@
 use std::{str::FromStr, string::ToString, iter::FromIterator};
 
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 use rusqlite::{
@@ -40,7 +41,8 @@ use rusqlite::{
 ///  // Assert that the retrieved SqlVec matches the original.
 ///  assert_eq!(values, db_values);
 /// ```
-#[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct SqlVec<T: ToString + FromStr>(Vec<T>);
 
 impl<T: ToString + FromStr> SqlVec<T> {

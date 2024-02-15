@@ -17,4 +17,7 @@ license = "GPL-3.0"
 
 [dependencies]
 rusqlite = ">=0.27,<=0.30"
-serde = { version = "1.0.196", features = ["derive"] }
+serde = { version = "1.0.196", features = ["derive"], optional = true }
+
+[features]
+serde = ["dep:serde"]

@@ -1,4 +1,4 @@
-use std::{str::FromStr, string::ToString, iter::FromIterator};
+use std::{iter::FromIterator, str::FromStr, string::ToString};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -11,7 +11,7 @@ use rusqlite::{
 /// A generic container for vectors whose contents implement ToString & FromStr.
 ///
 /// `SqlVec` implements ToSql & FromSql storing values as `\u{F1}` delimited text, allowing for SQL operations.
-/// 
+///
 /// # Example
 /// ```
 ///  use sqlvec::SqlVec;
@@ -42,7 +42,7 @@ use rusqlite::{
 ///  assert_eq!(values, db_values);
 /// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, PartialEq, Eq, Clone, Default)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SqlVec<T: ToString + FromStr>(Vec<T>);
 
 impl<T: ToString + FromStr> SqlVec<T> {
@@ -68,12 +68,12 @@ impl<T: ToString + FromStr> SqlVec<T> {
     /// # Example
     ///
     /// ```
-    /// use sqlvec::SqlVec; 
-    /// 
-    /// let sql_vec = SqlVec::new(vec![1, 2]); 
-    /// let vec = sql_vec.into_inner(); 
-    /// 
-    /// assert_eq!(vec, vec![1, 2]); 
+    /// use sqlvec::SqlVec;
+    ///
+    /// let sql_vec = SqlVec::new(vec![1, 2]);
+    /// let vec = sql_vec.into_inner();
+    ///
+    /// assert_eq!(vec, vec![1, 2]);
     ///
     /// ```
     pub fn into_inner(self) -> Vec<T> {
@@ -85,10 +85,10 @@ impl<T: ToString + FromStr> SqlVec<T> {
     /// # Example
     ///
     /// ```
-    /// use sqlvec::SqlVec; 
-    /// 
-    /// let sql_vec = SqlVec::new(vec![1, 2]); 
-    /// let vec_ref = sql_vec.inner(); 
+    /// use sqlvec::SqlVec;
+    ///
+    /// let sql_vec = SqlVec::new(vec![1, 2]);
+    /// let vec_ref = sql_vec.inner();
     ///
     ///
     /// assert_eq!(vec_ref, &vec![1, 2]);
@@ -147,5 +147,42 @@ impl<T: ToString + FromStr> FromSql for SqlVec<T> {
             .filter_map(|s| s.parse().ok())
             .collect();
         Ok(SqlVec(items))
+    }
+}
+
+// Manually implemented so `T` does not require default trait
+impl<T: ToString + FromStr> Default for SqlVec<T> {
+    /// Unlike `Vec`, `SqlVec` does not require `T` to implement the `Default` trait.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use sqlvec::SqlVec;
+    ///
+    /// use std::str::FromStr;
+    ///
+    /// struct MyType {
+    ///     value: i32,
+    /// }
+    ///
+    /// impl ToString for MyType {
+    ///     fn to_string(&self) -> String {
+    ///         self.value.to_string()
+    ///     }
+    /// }
+    ///
+    /// impl FromStr for MyType {
+    ///     type Err = std::num::ParseIntError;
+    ///
+    ///     fn from_str(s: &str) -> Result<Self, Self::Err> {
+    ///         s.parse::<i32>().map(|value| MyType { value })
+    ///     }
+    /// }
+    ///
+    /// let default: SqlVec<MyType> = SqlVec::default();
+    ///
+    /// ```
+    fn default() -> Self {
+        Self(Vec::new())
     }
 }
